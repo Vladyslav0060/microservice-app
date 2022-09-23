@@ -1,12 +1,14 @@
 const express = require("express");
 const app = express();
 const axios = require("axios").default;
-const { deals, contacts, tasks } = require("./services");
+const cors = require("cors");
+const { deals, contacts, tasks } = require("./src/services");
 require("dotenv").config();
 
 process.on("uncaughtException", () => {});
 axios.defaults.headers.common["Api-Token"] = process.env.API_TOKEN;
 
+app.use(cors());
 app.get("/", async (req, res) => {
     try {
         const { email } = req.query;
@@ -21,4 +23,4 @@ app.get("/", async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log("works on 3000"));
+app.listen(5000, () => console.log("works on 5000"));
