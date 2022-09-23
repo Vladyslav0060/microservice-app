@@ -1,27 +1,24 @@
 const express = require("express");
 const app = express();
 const axios = require("axios").default;
+const { deals, contacts, tasks } = require("./services");
 require("dotenv").config();
 
-// respond with "hello world" when a GET request is made to the homepage
-app.get("/", (req, res) => {
-  const options = {
-    method: "GET",
-    url: "https://curtisstreetmedia1651721711.api-us1.com/api/3/contacts?status=-1&orders[email]=ASC",
-    headers: {
-      accept: "application/json",
-      "Api-Token": process.env.API_TOKEN,
-    },
-  };
-  axios
-    .request(options)
-    .then(function (response) {
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.error(error);
-    });
-  res.send("hello world");
+process.on("uncaughtException", () => {});
+axios.defaults.headers.common["Api-Token"] = process.env.API_TOKEN;
+
+app.get("/", async (req, res) => {
+    try {
+        const { email } = req.query;
+        if (!email) res.status(401).send("Email address required");
+        const userCreds = await contacts.listAllContacts(email);
+        const foundDeals = await deals.listAllDeals(userCreds);
+        const taskIds = await tasks.listAllTasks(foundDeals);
+        if (taskIds.length) await tasks.closeTasks(taskIds);
+        return res.sendStatus(200);
+    } catch (error) {
+        res.send(404).send(error);
+    }
 });
 
 app.listen(3000, () => console.log("works on 3000"));
