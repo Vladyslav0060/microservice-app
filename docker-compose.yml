@@ -10,19 +10,9 @@ services:
     ports:
       - "6379:6379"
 
-  redis-commander:
-    container_name: redis-commander_container
-    image: rediscommander/redis-commander
-    restart: always
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    ports:
-      - "8081:8081"
-
   server:
     container_name: backend_container
     build: .
-    image: node:16-alpine
     environment:
       REDIS_URL: redis://redis:6379
       AC_BASE_URL: https://curtisstreetmedia1651721711.api-us1.com/api/3/
