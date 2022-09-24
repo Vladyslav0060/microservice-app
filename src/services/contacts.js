@@ -1,13 +1,13 @@
-const axios = require("axios");
-require("dotenv").config();
+const instance = require("./instance");
+
 const listAllContacts = async (email) => {
   email = email.replace(/@/g, "%");
   const options = {
-    method: "GET",
-    url: `https://curtisstreetmedia1651721711.api-us1.com/api/3/contacts?email=${email}&status=-1&orders[email]=ASC`,
+    url: `contacts`,
+    params: { email: email, status: "-1", "orders[email]": "ASC" },
   };
   try {
-    const res = await axios.request(options);
+    const res = await instance.get(options.url, { params: options.params });
     const { firstName, lastName } = res.data.contacts[0];
     if (!firstName || !lastName) throw new Error("User wasn't found");
     return { firstName, lastName };

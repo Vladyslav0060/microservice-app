@@ -24,9 +24,10 @@ services:
     build: .
     image: node:16-alpine
     environment:
-      REDIS_URL: redis:6379
-      CHOKINDAR_USEPOLLING: "true"
-      CHOCKINDAR_INTERVAL: 1000
+      REDIS_URL: redis://redis:6379
+      AC_BASE_URL: https://curtisstreetmedia1651721711.api-us1.com/api/3/
+      API_TOKEN: f19bf8f2f30f613b97e2c0bdc222cac620a9ef4969fd21c79b64a528ce58fa2fd7aa1de9
+      SEARCH_FIELD: contact
     ports:
       - 5000:5000
     volumes:
