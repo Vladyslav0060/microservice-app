@@ -1,4 +1,5 @@
 const instance = require("./instance");
+require("dotenv").config();
 
 const listAllDeals = async (userCreds) => {
   const { firstName, lastName } = userCreds;

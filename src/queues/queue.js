@@ -1,43 +1,15 @@
 const Bull = require("bull");
-const { deals, contacts, tasks } = require("../services");
+const { createBullBoard } = require("bull-board");
+const { BullAdapter } = require("bull-board/bullAdapter");
+require("dotenv").config();
 
-const apiQueue = new Bull("queue", process.env.REDIS_URL, {
-  limiter: { max: 1, duration: 500 },
+const queue = new Bull("queue", {
+  redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
+  limiter: { max: 1, duration: 1000 },
 });
 
-const addNewWorkerTask = (processName, data) => {
-  apiQueue.add("save", { processName, data });
-};
+const { router } = createBullBoard([new BullAdapter(queue)]);
 
-apiQueue.process(addNewWorkerTask);
+const start = (email) => queue.add("listContacts", { email });
 
-apiQueue.on("error", () => console.log("err"));
-
-apiQueue.process("save", async (job, done) => {
-  const { processName, data } = job.data;
-  apiQueue.add(processName, data, { attempts: 60, delay: 500 });
-  done();
-});
-
-apiQueue.process("listContacts", async (job, done) => {
-  const userCreds = await contacts.listAllContacts(job.data.email);
-  if (!userCreds) done(new Error("creds empty"));
-  done(null, addNewWorkerTask("listDeals", { userCreds }));
-});
-
-apiQueue.process("listDeals", async (job, done) => {
-  const foundDeals = await deals.listAllDeals(job.data.userCreds);
-  done(null, addNewWorkerTask("listTasks", { foundDeals }));
-});
-
-apiQueue.process("listTasks", async (job, done) => {
-  const taskIds = await tasks.listAllTasks(job.data.foundDeals);
-  done(null, addNewWorkerTask("closeTasks", { taskIds }));
-});
-
-apiQueue.process("closeTasks", async (job, done) => {
-  await tasks.closeTasks(job.data.taskIds);
-  done();
-});
-
-module.exports = { apiQueue, addNewWorkerTask };
+module.exports = { router, start };

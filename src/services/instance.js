@@ -1,4 +1,5 @@
 const axios = require("axios").default;
+require("dotenv").config();
 
 const instance = axios.create({
   headers: { "Api-Token": process.env.API_TOKEN },

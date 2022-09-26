@@ -1,14 +1,7 @@
 const express = require("express");
 const app = express();
-const { addNewWorkerTask, apiQueue } = require("./src/queues/queue");
+const { router, start } = require("./src/queues");
 require("dotenv").config();
-const { createBullBoard } = require("bull-board");
-const { BullAdapter } = require("bull-board/bullAdapter");
-process.on("uncaughtException", (error) => {
-  console.log(error);
-});
-
-const { router } = createBullBoard([new BullAdapter(apiQueue)]);
 
 app.use("/admin/queues", router);
 
@@ -16,11 +9,11 @@ app.get("/", async (req, res) => {
   try {
     const { email } = req.query;
     if (!email) return res.sendStatus(401);
-    addNewWorkerTask("listContacts", { email });
+    start(email);
     return res.sendStatus(200);
   } catch (error) {
     return res.send(404).send(error);
   }
 });
 
-app.listen(5000, () => console.log("works on 5000"));
+app.listen(process.env.PORT, () => console.log(`works on ${process.env.PORT}`));
