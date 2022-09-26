@@ -6,7 +6,7 @@
   "scripts": {
     "start:prod": "node index.js",
     "start:dev": "nodemon index.js",
-    "start:worker": "nodemon ./worker/worker.js"
+    "start:worker": "node ./worker/worker.js"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +18,9 @@
     "docker": "^1.0.0",
     "docker-compose": "^0.23.17",
     "dotenv": "^16.0.2",
-    "express": "^4.18.1",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
     "nodemon": "^2.0.20"
   }
 }

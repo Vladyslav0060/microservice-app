@@ -16,4 +16,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT, () => console.log(`works on ${process.env.PORT}`));
+app.listen(process.env.PORT, () =>
+  console.log(`Started on ${process.env.PORT}`)
+);
