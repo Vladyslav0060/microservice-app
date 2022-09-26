@@ -5,7 +5,9 @@ const listAllDeals = async (userCreds) => {
   const options = {
     url: `deals`,
     params: {
-      "filters[search_field]": `${process.env.SEARCH_FIELD}%3D${firstName}%20${lastName}`,
+      "filters[search_field]": `${process.env.SEARCH_FIELD}${encodeURIComponent(
+        "="
+      )}${firstName}${encodeURIComponent(" ")}${lastName}`,
       "orders[title]": "ASC",
       "orders[value]": "ASC",
       "orders[cdate]": "ASC",
@@ -16,6 +18,7 @@ const listAllDeals = async (userCreds) => {
   };
   try {
     const res = await instance.get(options.url, { params: options.params });
+    if (!res.data?.deals) throw new Error("No deals were found");
     return res.data.deals.map((deal) => deal.id);
   } catch (error) {
     throw new Error(error);

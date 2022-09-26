@@ -4,15 +4,11 @@ const { addNewWorkerTask, apiQueue } = require("./src/queues/queue");
 require("dotenv").config();
 const { createBullBoard } = require("bull-board");
 const { BullAdapter } = require("bull-board/bullAdapter");
-const workerQueue = require("./src/services/worker");
 process.on("uncaughtException", (error) => {
   console.log(error);
 });
 
-const { router } = createBullBoard([
-  new BullAdapter(apiQueue),
-  new BullAdapter(workerQueue),
-]);
+const { router } = createBullBoard([new BullAdapter(apiQueue)]);
 
 app.use("/admin/queues", router);
 

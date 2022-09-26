@@ -1,18 +1,23 @@
 const Bull = require("bull");
 const { deals, contacts, tasks } = require("../services");
-const workerQueue = require("../services/worker");
 
 const apiQueue = new Bull("queue", process.env.REDIS_URL, {
   limiter: { max: 1, duration: 500 },
 });
 
-const addNewWorkerTask = (name, data) => {
-  apiQueue.add(name, data, { attempts: 60, delay: 500 });
+const addNewWorkerTask = (processName, data) => {
+  apiQueue.add("save", { processName, data });
 };
 
-workerQueue.process(addNewWorkerTask);
+apiQueue.process(addNewWorkerTask);
 
 apiQueue.on("error", () => console.log("err"));
+
+apiQueue.process("save", async (job, done) => {
+  const { processName, data } = job.data;
+  apiQueue.add(processName, data, { attempts: 60, delay: 500 });
+  done();
+});
 
 apiQueue.process("listContacts", async (job, done) => {
   const userCreds = await contacts.listAllContacts(job.data.email);
@@ -31,7 +36,6 @@ apiQueue.process("listTasks", async (job, done) => {
 });
 
 apiQueue.process("closeTasks", async (job, done) => {
-  console.log(job.data);
   await tasks.closeTasks(job.data.taskIds);
   done();
 });
