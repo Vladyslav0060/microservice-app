@@ -1,16 +1,20 @@
 const Bull = require("bull");
-const { contacts, deals, tasks } = require("../src/services");
 require("dotenv").config();
+const { contacts, deals, tasks } = require("../src/services");
 
 process.on("uncaughtException", (error) => console.log(error));
 
 const queue = new Bull("queue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
-  limiter: { max: 1, duration: 1000 },
+  limiter: { max: 5, duration: 1000 },
 });
 
 const addToQueue = (name, data, ...props) =>
-  queue.add(name, data, { attempts: 60, backoff: 500, ...props });
+  queue.add(name, data, {
+    attempts: 60,
+    backoff: 500,
+    ...props,
+  });
 
 queue.process("listContacts", async (job, done) => {
   const userCreds = await contacts.listAllContacts(job.data.email);

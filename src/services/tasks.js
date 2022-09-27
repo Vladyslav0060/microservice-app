@@ -1,5 +1,4 @@
 const instance = require("./instance");
-require("dotenv").config();
 
 const listAllTasks = async (foundIds) => {
   return await Promise.all(

@@ -1,5 +1,4 @@
 const instance = require("./instance");
-require("dotenv").config();
 
 const listAllContacts = async (email) => {
   email = email.replace(/@/g, "%");
