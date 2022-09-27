@@ -4,17 +4,23 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start:prod": "node index.js",
     "start:dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:worker": "node ./worker/worker.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "api": "^4.5.2",
     "axios": "^0.27.2",
+    "bull": "^4.9.0",
+    "bull-board": "^2.1.3",
+    "docker": "^1.0.0",
+    "docker-compose": "^0.23.17",
     "dotenv": "^16.0.2",
-    "express": "^4.18.1",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
     "nodemon": "^2.0.20"
   }
 }
