@@ -13,6 +13,7 @@ services:
   server:
     container_name: backend_container
     build: .
+    image: vladyslav0060/microservice-app_server:latest
     restart: always
     ports:
       - ${PORT}:${PORT}
@@ -26,6 +27,7 @@ services:
   worker:
     container_name: worker_container
     build: .
+    image: vladyslav0060/microservice-app_worker:latest
     restart: always
     command: npm run start:worker
     depends_on:
