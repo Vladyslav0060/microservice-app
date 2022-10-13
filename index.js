@@ -20,7 +20,7 @@ app.get("/", async (req, res) => {
   try {
     const { email } = req.query;
     if (!email) return res.sendStatus(401);
-    start(email);
+    start(email.split(" ").join("+"));
     return res.sendStatus(200);
   } catch (error) {
     return res.send(404).send(error);
