@@ -4,14 +4,14 @@ const listAllContacts = async (email) => {
   email = email.replace(/@/g, "%");
   const options = {
     url: `contacts`,
-    params: { email: email, status: "-1", "orders[email]": "ASC" },
+    params: { email: email, status: "-1" },
   };
   try {
     const res = await instance.get(options.url, { params: options.params });
     if (!res.data?.contacts[0]) return false;
-    const { firstName, lastName } = res.data.contacts[0];
-    if (!firstName || !lastName) throw new Error("User wasn't found");
-    return { firstName, lastName };
+    const { id } = res.data.contacts[0];
+    if (!id) throw new Error("User wasn't found");
+    return id;
   } catch (error) {
     throw new Error(error);
   }

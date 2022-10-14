@@ -5,7 +5,12 @@ const listAllTasks = async (foundIds) => {
     foundIds.map(async (id) => {
       const options = {
         url: `dealTasks`,
-        params: { "filters[reltype]": "Deal", "filters[relid]": id },
+        params: {
+          "filters[reltype]": "Deal",
+          "filters[relid]": id,
+          "filters[d_tasktypeid]": "5",
+          "filters[status]": "0",
+        },
       };
       const response = await instance.get(options.url, {
         params: options.params,
