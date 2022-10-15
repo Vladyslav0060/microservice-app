@@ -17,13 +17,13 @@ const addToQueue = (name, data, ...props) =>
   });
 
 queue.process("listContacts", async (job, done) => {
-  const userCreds = await contacts.listAllContacts(job.data.email);
-  if (!userCreds) done(new Error("creds empty"));
-  done(null, addToQueue("listDeals", { userCreds }));
+  const userId = await contacts.listAllContacts(job.data.email);
+  if (!userId) done(new Error("creds empty"));
+  done(null, addToQueue("listDeals", { userId }));
 });
 
 queue.process("listDeals", async (job, done) => {
-  const foundDeals = await deals.listAllDeals(job.data.userCreds);
+  const foundDeals = await deals.listAllDeals(job.data.userId);
   done(null, addToQueue("listTasks", { foundDeals }));
 });
 
