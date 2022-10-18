@@ -17,22 +17,25 @@ const addToQueue = (name, data, ...props) =>
   });
 
 queue.process("listContacts", async (job, done) => {
-  const userId = await contacts.listAllContacts(job.data.email);
+  const userId = await contacts.listAllContacts(job.data.email, job.data.dev);
   if (!userId) done(new Error("creds empty"));
-  done(null, addToQueue("listDeals", { userId }));
+  done(null, addToQueue("listDeals", { userId, dev: job.data.dev }));
 });
 
 queue.process("listDeals", async (job, done) => {
-  const foundDeals = await deals.listAllDeals(job.data.userId);
-  done(null, addToQueue("listTasks", { foundDeals }));
+  const foundDeals = await deals.listAllDeals(job.data.userId, job.data.dev);
+  done(null, addToQueue("listTasks", { foundDeals, dev: job.data.dev }));
 });
 
 queue.process("listTasks", async (job, done) => {
-  const taskIds = await tasks.listAllTasks(job.data.foundDeals);
-  done(null, addToQueue("closeTasks", { taskIds }, { priority: 3 }));
+  const taskIds = await tasks.listAllTasks(job.data.foundDeals, job.data.dev);
+  done(
+    null,
+    addToQueue("closeTasks", { taskIds, dev: job.data.dev }, { priority: 3 })
+  );
 });
 
 queue.process("closeTasks", async (job, done) => {
-  await tasks.closeTasks(job.data.taskIds);
+  await tasks.closeTasks(job.data.taskIds, job.data.dev);
   done();
 });

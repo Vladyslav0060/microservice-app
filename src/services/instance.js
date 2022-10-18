@@ -5,4 +5,9 @@ const instance = axios.create({
   baseURL: process.env.AC_BASE_URL,
 });
 
-module.exports = instance;
+const instanceDev = axios.create({
+  headers: { "Api-Token": process.env.API_TOKEN_DEV },
+  baseURL: process.env.AC_BASE_URL_DEV,
+});
+
+module.exports = { instance, instanceDev };
