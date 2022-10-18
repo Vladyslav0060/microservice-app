@@ -1,6 +1,7 @@
-const instance = require("./instance");
+const { instance, instanceDev } = require("./instance");
 
-const listAllTasks = async (foundIds) => {
+const listAllTasks = async (foundIds, dev) => {
+  const http = dev ? instanceDev : instance;
   return await Promise.all(
     foundIds.map(async (id) => {
       const options = {
@@ -8,11 +9,13 @@ const listAllTasks = async (foundIds) => {
         params: {
           "filters[reltype]": "Deal",
           "filters[relid]": id,
-          "filters[d_tasktypeid]": "5",
+          "filters[d_tasktypeid]": dev
+            ? process.env.SEARCH_FIELD_DEV
+            : process.env.SEARCH_FIELD,
           "filters[status]": "0",
         },
       };
-      const response = await instance.get(options.url, {
+      const response = await http.get(options.url, {
         params: options.params,
       });
       return response.data.dealTasks.map((dealTask) => {
@@ -29,7 +32,8 @@ const listAllTasks = async (foundIds) => {
     });
 };
 
-const closeTasks = async (taskIds) => {
+const closeTasks = async (taskIds, dev) => {
+  const http = dev ? instanceDev : instance;
   return await Promise.all(
     taskIds.map(async (taskId) => {
       const options = {
@@ -37,7 +41,7 @@ const closeTasks = async (taskIds) => {
         url: `dealTasks/${taskId}`,
         data: { dealTask: { status: 1 } },
       };
-      await instance.request(options);
+      await http.request(options);
     })
   ).catch((e) => {
     throw new Error(e);
