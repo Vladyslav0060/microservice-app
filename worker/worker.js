@@ -9,6 +9,16 @@ const queue = new Bull("queue", {
   limiter: { max: 5, duration: 1000 },
 });
 
+const testQueue = new Bull("testQueue", {
+  redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
+});
+
+testQueue.process(async function (job, done) {
+  console.log("Good");
+  console.log(job.data, new Date().getSeconds());
+  done();
+});
+
 const addToQueue = (name, data, ...props) =>
   queue.add(name, data, {
     attempts: 60,
