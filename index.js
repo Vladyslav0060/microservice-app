@@ -13,19 +13,17 @@ testQueue.on("error", (e) => console.log(e));
 const app = express();
 
 loader();
-// app.use(() => {
-//   console.log("works");
-//   // testQueue.add(
-//   //   { foo: "test" },
-//   //   {
-//   //     repeat: {
-//   //       every: 1000,
-//   //       limit: 100,
-//   //     },
-//   //     lifo: true,
-//   //   }
-//   // );
-// });
+
+// testQueue.add(
+//   { foo: "test" },
+//   {
+//     repeat: {
+//       every: 1000,
+//       limit: 100,
+//     },
+//     lifo: true,
+//   }
+// );
 
 app.use("/admin/queues", adminRouter);
 

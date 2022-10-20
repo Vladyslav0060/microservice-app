@@ -9,7 +9,7 @@ const loader = async () => {
     })
     .set("content-type", "application/x-www-form-urlencoded");
   console.log(response.statusCode);
-  console.log(response.text);
+  // console.log(response.text);
   if (response.statusCode === 302) {
     console.log(response.headers.location);
   }

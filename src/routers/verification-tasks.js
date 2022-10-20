@@ -8,14 +8,6 @@ const queue = new Bull("queue", {
   limiter: { max: 5, duration: 1000 },
 });
 
-const testQueue = new Bull("testQueue");
-
-testQueue.process(function (job) {
-  console.log(job.data, new Date());
-});
-
-testQueue.add({ test: "test" }, { repeat: { cron: "* * * * *" } });
-
 const start = (email, dev) => queue.add("listContacts", { email, dev });
 
 const verificateTasks = async (req, res) => {
