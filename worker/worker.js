@@ -1,6 +1,7 @@
 const Bull = require("bull");
 require("dotenv").config();
 const { contacts, deals, tasks } = require("../src/services");
+const loader = require("../src/services/loader/loader");
 
 process.on("uncaughtException", (error) => console.log(error));
 
@@ -14,8 +15,7 @@ const testQueue = new Bull("testQueue", {
 });
 
 testQueue.process(async function (job, done) {
-  console.log("Good");
-  console.log(job.data, new Date().getSeconds());
+  await loader();
   done();
 });
 

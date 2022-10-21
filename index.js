@@ -2,7 +2,7 @@ const Bull = require("bull");
 const express = require("express");
 require("dotenv").config();
 const { adminRouter, verificationRouter } = require("./src/routers");
-const loader = require("./src/services/loader");
+const loader = require("./src/services/loader/loader");
 
 const testQueue = new Bull("testQueue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
@@ -12,18 +12,14 @@ testQueue.on("error", (e) => console.log(e));
 
 const app = express();
 
-loader();
+// loader();
 
-// testQueue.add(
-//   { foo: "test" },
-//   {
-//     repeat: {
-//       every: 1000,
-//       limit: 100,
-//     },
-//     lifo: true,
-//   }
-// );
+testQueue.add(null, {
+  repeat: {
+    every: 30000,
+    limit: 5,
+  },
+});
 
 app.use("/admin/queues", adminRouter);
 
