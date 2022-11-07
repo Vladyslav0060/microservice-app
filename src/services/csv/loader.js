@@ -1,7 +1,9 @@
 const puppeteer = require("puppeteer");
 const downloadCsv = require("./downloadCsv");
+const { insertCsv } = require("../dbClient");
 
 const loader = async () => {
+  console.log("start loader");
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: "/usr/bin/chromium-browser",
@@ -15,8 +17,8 @@ const loader = async () => {
     await page.click('button[type="submit"]'),
     await page.waitForNavigation({ waitUntil: "networkidle2" }),
   ]);
-  const test = await page.$$("span.action_item");
-  await test[0].click();
+  const reportButton = await page.$$("span.action_item");
+  await reportButton[0].click();
   await page.waitForNavigation();
   await page.waitForFunction(
     'document.querySelector("body").innerText.includes("Report generated!")'
@@ -24,8 +26,8 @@ const loader = async () => {
   const downloadLink = await page.$eval("#js_flash a", (element) =>
     element.getAttribute("href")
   );
-  downloadCsv(downloadLink);
-  await page.screenshot({ path: "screenshot.png" });
+  const parcedCsv = await downloadCsv(downloadLink);
+  await insertCsv("ic_csv", parcedCsv);
   await browser.close();
 };
 
