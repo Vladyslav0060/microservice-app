@@ -1,9 +1,8 @@
 const puppeteer = require("puppeteer");
 const downloadCsv = require("./downloadCsv");
-const { insertCsv } = require("../dbClient");
+const { insertCsv, truncateTable } = require("../dbClient");
 
 const loader = async () => {
-  console.log("start loader");
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: "/usr/bin/chromium-browser",
@@ -27,7 +26,8 @@ const loader = async () => {
     element.getAttribute("href")
   );
   const parcedCsv = await downloadCsv(downloadLink);
-  await insertCsv("ic_csv", parcedCsv);
+  await truncateTable("ic_uc_joined_report");
+  await insertCsv("ic_uc_joined_report", parcedCsv);
   await browser.close();
 };
 

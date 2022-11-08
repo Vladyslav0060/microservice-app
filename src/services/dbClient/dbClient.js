@@ -3,15 +3,18 @@ const { Pool } = require("pg");
 class DatabaseClient {
   constructor() {
     this.client = new Pool({
-      host: "52.90.35.229",
-      port: 5432,
-      user: "postgres",
-      password: "Denver1234",
+      host: process.env.IC_UC_HOST,
+      port: process.env.IC_UC_PORT,
+      user: process.env.IC_UC_USER,
+      password: process.env.IC_UC_PASSWORD,
     });
     this.client.connect((err) => console.log(err ? "DB ❌" : "DB ✅"));
   }
 
-  getTableColumns = async (tableName = "ic_csv", quoted = true) => {
+  getTableColumns = async (
+    tableName = "ic_uc_joined_report",
+    quoted = true
+  ) => {
     try {
       return this.client
         .query(
@@ -29,6 +32,14 @@ class DatabaseClient {
         });
     } catch (error) {
       console.log("getTableColumns ❌", error);
+    }
+  };
+
+  truncateTable = async (name) => {
+    try {
+      await this.client.query(`TRUNCATE TABLE ${name}`);
+    } catch (error) {
+      console.log("truncateTable ❌", error);
     }
   };
 
