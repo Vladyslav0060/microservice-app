@@ -1,12 +1,22 @@
 const Bull = require("bull");
 require("dotenv").config();
 const { contacts, deals, tasks } = require("../src/services");
+const loader = require("../src/services/csv/loader");
 
-process.on("uncaughtException", (error) => console.log(error));
+process.on("uncaughtException", (error) => console.log("worker ❌", error));
 
 const queue = new Bull("queue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
   limiter: { max: 5, duration: 1000 },
+});
+
+const csvQueue = new Bull("csvQueue", {
+  redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
+});
+
+csvQueue.process(async function (job, done) {
+  await loader();
+  done();
 });
 
 const addToQueue = (name, data, ...props) =>
