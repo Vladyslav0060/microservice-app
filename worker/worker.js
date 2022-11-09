@@ -1,7 +1,7 @@
 const Bull = require("bull");
 require("dotenv").config();
-const { contacts, deals, tasks } = require("../src/services");
-const loader = require("../src/services/csv/loader");
+const { contacts, deals, tasks } = require("../src/services/ac/verification");
+const loader = require("../src/services/ac/dashboard/csv/loader");
 
 process.on("uncaughtException", (error) => console.log("worker ❌", error));
 

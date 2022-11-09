@@ -54,6 +54,15 @@ class DatabaseClient {
       console.log("insertCsv ❌", error);
     }
   };
+
+  insertContacts = async (name, data) => {
+    try {
+      await this.client.query(`INSERT INTO ${name} VALUES ${data}`);
+      return;
+    } catch (error) {
+      console.log("insertContacts ❌", error);
+    }
+  };
 }
 
 module.exports = new DatabaseClient();

@@ -1,7 +1,7 @@
-const { instance, instanceDev } = require("./instance");
+const { ac_axios, ac_axios_dev } = require("./instance");
 
 const listAllTasks = async (foundIds, dev) => {
-  const http = dev ? instanceDev : instance;
+  const http = dev ? ac_axios_dev : ac_axios;
   return await Promise.all(
     foundIds.map(async (id) => {
       const options = {
@@ -33,7 +33,7 @@ const listAllTasks = async (foundIds, dev) => {
 };
 
 const closeTasks = async (taskIds, dev) => {
-  const http = dev ? instanceDev : instance;
+  const http = dev ? ac_axios_dev : ac_axios;
   return await Promise.all(
     taskIds.map(async (taskId) => {
       const options = {
