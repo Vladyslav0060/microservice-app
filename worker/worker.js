@@ -1,7 +1,15 @@
 const Bull = require("bull");
 require("dotenv").config();
-const { contacts, deals, tasks } = require("../src/services/ac/verification");
-const loader = require("../src/services/ac/dashboard/csv/loader");
+const { contacts, deals, tasks } = require("../src/services/verification");
+const loader = require("../src/services/dashboard/csv/loader");
+const { postgres, postgres_ac } = require("../src/services/dbClient");
+const {
+  sql_contacts,
+  sql_deals,
+  sql_tasks,
+  sql_pipelines,
+} = require("../src/services/dashboard/sql");
+const sql_stages = require("../src/services/dashboard/sql/sql_stages");
 
 process.on("uncaughtException", (error) => console.log("worker ❌", error));
 
@@ -10,14 +18,54 @@ const queue = new Bull("queue", {
   limiter: { max: 5, duration: 1000 },
 });
 
-const csvQueue = new Bull("csvQueue", {
+const dbQueue = new Bull("dbQueue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
 });
 
-csvQueue.process(async function (job, done) {
-  await loader();
+dbQueue.process(async function (job, done) {
+  //it works
+
+  // await loader();
+  done(null, addToDbQueue("update_ic_ac_contacts"));
   done();
 });
+
+dbQueue.process("update_ic_ac_contacts", async (job, done) => {
+  await postgres.truncate("ic_ac_contacts");
+  await postgres.insert("ic_ac_contacts", await sql_contacts());
+  done(null, addToDbQueue("update_ic_ac_deals"));
+});
+
+dbQueue.process("update_ic_ac_deals", async (job, done) => {
+  await postgres_ac.truncate("ic_ac_deals");
+  await postgres_ac.insert("ic_ac_deals", await sql_deals());
+  done(null, addToDbQueue("update_ic_ac_tasks"));
+});
+
+dbQueue.process("update_ic_ac_tasks", async (job, done) => {
+  await postgres_ac.truncate("ic_ac_tasks");
+  await postgres_ac.insert("ic_ac_tasks", await sql_tasks());
+  done(null, addToDbQueue("update_ic_ac_pipelines"));
+});
+
+dbQueue.process("update_ic_ac_pipelines", async (job, done) => {
+  await postgres_ac.truncate("ic_ac_pipelines");
+  await postgres_ac.insert("ic_ac_pipelines", await sql_pipelines());
+  done(null, addToDbQueue("update_ic_ac_stages"));
+});
+
+dbQueue.process("update_ic_ac_stages", async (job, done) => {
+  await postgres_ac.truncate("ic_ac_stages");
+  await postgres_ac.insert("ic_ac_stages", await sql_stages());
+  done();
+});
+
+const addToDbQueue = (name, data = {}, ...props) =>
+  dbQueue.add(name, data, {
+    attempts: 60,
+    backoff: 500,
+    ...props,
+  });
 
 const addToQueue = (name, data, ...props) =>
   queue.add(name, data, {

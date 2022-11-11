@@ -1,14 +1,17 @@
 const { Pool } = require("pg");
 
 class DatabaseClient {
-  constructor() {
+  constructor(database) {
     this.client = new Pool({
       host: process.env.IC_UC_HOST,
       port: process.env.IC_UC_PORT,
       user: process.env.IC_UC_USER,
       password: process.env.IC_UC_PASSWORD,
+      database: database,
     });
-    this.client.connect((err) => console.log(err ? "DB ❌" : "DB ✅"));
+    this.client.connect((err) =>
+      console.log(err ? `DB ${database} ❌` : `DB ${database} ✅`)
+    );
   }
 
   getTableColumns = async (
@@ -35,34 +38,32 @@ class DatabaseClient {
     }
   };
 
-  truncateTable = async (name) => {
+  insertByColumns = async (name, values) => {
+    try {
+      const columns = await this.getTableColumns(name);
+      await this.client.query(
+        `INSERT INTO ${name} (${columns}) VALUES ${values}`
+      );
+    } catch (error) {
+      console.log("insertByColumns ❌", error);
+    }
+  };
+
+  truncate = async (name) => {
     try {
       await this.client.query(`TRUNCATE TABLE ${name}`);
     } catch (error) {
-      console.log("truncateTable ❌", error);
+      console.log("truncate ❌", error);
     }
   };
 
-  insertCsv = async (name, data) => {
+  insert = async (name, values) => {
     try {
-      const columns = await this.getTableColumns(name, true);
-      await this.client.query(
-        `INSERT INTO ${name} (${columns}) VALUES ${data}`
-      );
-      return;
+      await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
     } catch (error) {
-      console.log("insertCsv ❌", error);
-    }
-  };
-
-  insertContacts = async (name, data) => {
-    try {
-      await this.client.query(`INSERT INTO ${name} VALUES ${data}`);
-      return;
-    } catch (error) {
-      console.log("insertContacts ❌", error);
+      console.log("insert ❌", error);
     }
   };
 }
 
-module.exports = new DatabaseClient();
+module.exports = DatabaseClient;

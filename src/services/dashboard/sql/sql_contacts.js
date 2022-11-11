@@ -1,6 +1,6 @@
-const { ac_listAllContacts } = require("../../../axios");
+const { ac_listAllContacts } = require("../../axios");
 
-const contacts = async () => {
+const sql_contacts = async () => {
   try {
     const response = await ac_listAllContacts();
     const result = response.data.contacts
@@ -23,4 +23,4 @@ const contacts = async () => {
   }
 };
 
-module.exports = contacts;
+module.exports = sql_contacts;

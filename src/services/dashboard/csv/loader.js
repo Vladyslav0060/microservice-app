@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 const downloadCsv = require("./downloadCsv");
-const { insertCsv, truncateTable } = require("../dbClient");
+const { postgres } = require("../../dbClient");
 
 const loader = async () => {
   const browser = await puppeteer.launch({
@@ -26,8 +26,8 @@ const loader = async () => {
     element.getAttribute("href")
   );
   const parcedCsv = await downloadCsv(downloadLink);
-  await truncateTable("ic_uc_joined_report");
-  await insertCsv("ic_uc_joined_report", parcedCsv);
+  await postgres.truncate("ic_uc_joined_report");
+  await postgres.insertByColumns("ic_uc_joined_report", parcedCsv);
   await browser.close();
 };
 
