@@ -26,37 +26,42 @@ dbQueue.process(async function (job, done) {
   //it works
 
   // await loader();
-  done(null, addToDbQueue("update_ic_ac_contacts"));
+  // done(null, addToDbQueue("update_ic_ac_contacts"));
   done();
 });
 
 dbQueue.process("update_ic_ac_contacts", async (job, done) => {
   await postgres.truncate("ic_ac_contacts");
+  console.log("inserting ic_ac_contacts");
   await postgres.insert("ic_ac_contacts", await sql_contacts());
   done(null, addToDbQueue("update_ic_ac_deals"));
 });
 
 dbQueue.process("update_ic_ac_deals", async (job, done) => {
-  await postgres_ac.truncate("ic_ac_deals");
-  await postgres_ac.insert("ic_ac_deals", await sql_deals());
+  await postgres.truncate("ic_ac_deals");
+  console.log("inserting ic_ac_deals");
+  await postgres.insert("ic_ac_deals", await sql_deals());
   done(null, addToDbQueue("update_ic_ac_tasks"));
 });
 
 dbQueue.process("update_ic_ac_tasks", async (job, done) => {
-  await postgres_ac.truncate("ic_ac_tasks");
-  await postgres_ac.insert("ic_ac_tasks", await sql_tasks());
+  await postgres.truncate("ic_ac_tasks");
+  console.log("inserting ic_ac_tasks");
+  await postgres.insert("ic_ac_tasks", await sql_tasks());
   done(null, addToDbQueue("update_ic_ac_pipelines"));
 });
 
 dbQueue.process("update_ic_ac_pipelines", async (job, done) => {
-  await postgres_ac.truncate("ic_ac_pipelines");
-  await postgres_ac.insert("ic_ac_pipelines", await sql_pipelines());
+  await postgres.truncate("ic_ac_pipelines");
+  console.log("inserting ic_ac_pipelines");
+  await postgres.insert("ic_ac_pipelines", await sql_pipelines());
   done(null, addToDbQueue("update_ic_ac_stages"));
 });
 
 dbQueue.process("update_ic_ac_stages", async (job, done) => {
-  await postgres_ac.truncate("ic_ac_stages");
-  await postgres_ac.insert("ic_ac_stages", await sql_stages());
+  await postgres.truncate("ic_ac_stages");
+  console.log("inserting ic_ac_stages");
+  await postgres.insert("ic_ac_stages", await sql_stages());
   done();
 });
 
