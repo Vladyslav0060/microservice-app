@@ -1,26 +1,11 @@
-const { ac_listAllPipelines } = require("../../axios");
+const { ac_listAllPipelines, dire_listAllPipelines } = require("../../axios");
 const { validateArray } = require("./utils");
 
-const sql_tasks = async () => {
+const sql_tasks = async (isDire = false) => {
   try {
-    const dealStages = await ac_listAllPipelines();
-    return validateArray(dealStages);
-    // const result = dealStages
-    //   .map((item) => {
-    //     const { links, ...contact } = item;
-    //     return `(${Object.values(contact).map((field) => {
-    //       return Array.isArray(field)
-    //         ? `'${JSON.stringify(field)}'`
-    //         : !field
-    //         ? `'${JSON.stringify(field).replace(/'/g, "''")}'`.replace(/"/g, "")
-    //         : `'${JSON.stringify(field)
-    //             .replace(/\'/g, "''")
-    //             .replace(/'/g, "''")
-    //             .replace(/"/g, "")}'`;
-    //     })})`;
-    //   })
-    //   .join(",");
-    // return result;
+    return validateArray(
+      isDire ? await dire_listAllPipelines() : await ac_listAllPipelines()
+    );
   } catch (error) {
     console.log("❌ contacts", error);
   }

@@ -26,6 +26,7 @@ const loader = async () => {
     element.getAttribute("href")
   );
   const parcedCsv = await downloadCsv(downloadLink);
+  console.log(parcedCsv);
   await postgres.truncate("ic_uc_joined_report");
   await postgres.insertByColumns("ic_uc_joined_report", parcedCsv);
   await browser.close();

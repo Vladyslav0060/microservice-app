@@ -1,44 +1,71 @@
 const express = require("express");
 require("dotenv").config();
 const { adminRouter, verificationRouter } = require("./src/routers");
-const {
-  ac_listAllContacts,
-  ac_listAllDeals,
-  ac_listAllTasks,
-  getData,
-  ac_axios,
-  ac_listAllCustomFieldsContacts,
-} = require("./src/services/axios");
 const csvService = require("./src/services/dashboard/csv/csvService");
+const { tables, postgres } = require("./src/services/dbClient");
 const {
-  sql_contacts,
-  sql_deals,
-  sql_pipelines,
   sql_tasks,
+  sql_users,
+  sql_deals,
+  sql_deals_fields,
+  sql_contacts,
   update_custom_fields_contacts,
+  update_custom_fields_deals,
+  sql_contacts_fields,
 } = require("./src/services/dashboard/sql");
+const {
+  dire_listAllTasks,
+  dire_listAllContacts,
+  dire_axios,
+  dire_listAllUsers,
+  dire_listAllDeals,
+  dire_listAllCustomFieldsContacts,
+  getData,
+} = require("./src/services/axios");
 const sql_stages = require("./src/services/dashboard/sql/sql_stages");
-const { postgres } = require("./src/services/dbClient");
-const _ = require("lodash");
+const loader = require("./src/services/dashboard/csv/loader");
+const { check_new_columns } = require("./src/services/dashboard/sql/utils");
 
 const app = express();
 
-csvService();
+// csvService();
 // sql_contacts();
 const test = async () => {
   console.log("start test");
-  // console.log(await ac_listAllCustomFieldsContacts());
-  // await update_custom_fields_contacts();
-  // await postgres.truncate("ic_ac_stages");
-  // await postgres.insert("ic_ac_stages", await sql_stages());
-  // await postgres.truncate("ic_ac_tasks");
-  // await postgres.insert("ic_ac_tasks", await sql_tasks());
-  await postgres.truncate("ic_ac_pipelines");
-  await postgres.insert("ic_ac_pipelines", await sql_pipelines());
-  // await postgres.truncate("ic_ac_deals");
-  // await postgres.insert("ic_ac_deals", await sql_deals());
-  // await postgres.truncate("ic_ac_contacts");
-  // await postgres.insert("ic_ac_contacts", await sql_contacts());
+
+  // await postgres.truncate(tables.IC_AC_DEALS);
+  // await postgres.insert(tables.IC_AC_DEALS, await sql_deals(false));
+  // await update_custom_fields_deals(false);
+
+  // await postgres.truncate(tables.IC_AC_CONTACTS);
+  // await postgres.insert(tables.IC_AC_CONTACTS, await sql_contacts(false));
+  // await update_custom_fields_contacts(false);
+  // await sql_contacts(true);
+  // await postgres.truncate(tables.DIRE_AC_CONTACTS);
+  // await postgres.insert(tables.DIRE_AC_CONTACTS, await sql_contacts(true));
+  // await check_new_columns(tables.DIRE_AC_CONTACTS);
+
+  // await update_custom_fields_contacts(true);
+  // const fields = await getData("fields", true);
+  // fields.forEach((field) => console.log(field.title));
+
+  // console.log("Started trunctate ", tables.DIRE_AC_DEALS);
+  // await postgres.truncate(tables.DIRE_AC_DEALS);
+  // console.log("Finished trunctate ", tables.DIRE_AC_DEALS);
+  // console.log("Started insert ", tables.DIRE_AC_DEALS);
+  // await postgres.insert(tables.DIRE_AC_DEALS, await sql_deals(true));
+  // console.log("Finished insert ", tables.DIRE_AC_DEALS);
+  // console.log("Started update custom fields ", tables.DIRE_AC_DEALS);
+  // await update_custom_fields_deals(true);
+  // console.log("Finished update custom fields ", tables.DIRE_AC_DEALS);
+  // await postgres.truncate(tables.DIRE_AC_DEALS_FIELDS);
+  // await postgres.insert(
+  //   tables.DIRE_AC_DEALS_FIELDS,
+  //   await sql_deals_fields(true)
+  // );
+  // await postgres.truncate(tables.DIRE_AC_CONTACTS);
+  // await postgres.insert(tables.DIRE_AC_CONTACTS, await sql_contacts(true));
+  // await update_custom_fields_contacts(true);
 };
 
 test();

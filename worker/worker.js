@@ -23,7 +23,7 @@ const dbQueue = new Bull("dbQueue", {
 });
 
 dbQueue.process(async function (job, done) {
-  //it works
+  console.log("it works");
 
   // await loader();
   // done(null, addToDbQueue("update_ic_ac_contacts"));

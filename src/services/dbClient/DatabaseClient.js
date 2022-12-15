@@ -10,7 +10,7 @@ class DatabaseClient {
       database: database,
     });
     this.client.connect((err) =>
-      console.log(err ? `DB ${database} ❌` : `DB ${database} ✅`)
+      console.log(err ? `DB ${database} ${err} ❌` : `DB ${database} ✅`)
     );
   }
 
@@ -23,7 +23,8 @@ class DatabaseClient {
         .query(
           `SELECT *
         FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_NAME = N'${tableName}'`
+        WHERE TABLE_NAME = N'${tableName}' ORDER BY 
+        ordinal_position`
         )
         .then((response) => {
           return response.rows
@@ -41,6 +42,7 @@ class DatabaseClient {
   insertByColumns = async (name, values) => {
     try {
       const columns = await this.getTableColumns(name);
+      console.log(columns);
       await this.client.query(
         `INSERT INTO ${name} (${columns}) VALUES ${values}`
       );
