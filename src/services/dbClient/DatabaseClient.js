@@ -8,6 +8,7 @@ class DatabaseClient {
       user: process.env.IC_UC_USER,
       password: process.env.IC_UC_PASSWORD,
       database: database,
+      ssl: true,
     });
     this.client.connect((err) =>
       console.log(err ? `DB ${database} ${err} ❌` : `DB ${database} ✅`)
@@ -43,6 +44,7 @@ class DatabaseClient {
     try {
       const columns = await this.getTableColumns(name);
       console.log(columns);
+      console.log(`INSERT INTO ${name} (${columns}) VALUES ${values}`);
       await this.client.query(
         `INSERT INTO ${name} (${columns}) VALUES ${values}`
       );

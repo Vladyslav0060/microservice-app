@@ -9,7 +9,7 @@ const downloadCsv = async (url) => {
         (item) => `('${item.map((el) => el.replace(/'/g, "''")).join("','")}')`
       );
     });
-  return response.slice(1);
+  return response;
 };
 
 module.exports = downloadCsv;

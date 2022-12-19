@@ -1,55 +1,56 @@
 const { tables, postgres } = require("../../dbClient");
 const { ac_listAllDeals, getData, dire_listAllDeals } = require("../../axios");
-const { validateArray, check_new_columns } = require("./utils");
-const _ = require("lodash");
+const { validateArray, validateField, check_new_columns } = require("./utils");
 
 const update_custom_fields_deals = async (isDire = false) => {
-  const result = {};
+  const table_name = isDire ? tables.DIRE_AC_DEALS : tables.IC_AC_DEALS;
   const fields = await getData("dealCustomFieldMeta", isDire);
   const fieldValues = await getData("dealCustomFieldData", isDire, {
     limit: 10000,
   });
 
-  const fieldsById = _.keyBy(fields, "id");
-  for (const currentField of fieldValues) {
-    //field by id | currentField.field = field_id
-    const fieldName = _.get(
-      fieldsById,
-      [currentField.customFieldId, "fieldLabel"],
-      null
-    );
-    if (!fieldName) continue; // move to next iteration
-    _.set(result, [currentField.dealId, fieldName], currentField.fieldValue);
-  }
-
-  // for (const [deal_id, data] of Object.entries(result)) {
-  //   console.log({ deal_id });
-  //   const values = Object.entries(data).map((entry) => {
-  //     console.log("Entry0 ", entry[0]);
-  //     console.log("Entry1 ", entry[1]);
-  //   });
-  //   // `"${entry[0]}"='${entry[1].replace(/'/g, "''")}'`})
-  // }
-
-  for (const [deal_id, data] of Object.entries(result)) {
-    const values = Object.entries(data)
-      .map(
-        (entry) =>
-          `"${entry[0]}"='${JSON.stringify(entry[1]).replace(/'/g, "''")}'`
+  for (let field of fields) {
+    const fieldId = Number(field.id);
+    const values = fieldValues
+      .filter(
+        (fieldValue) =>
+          fieldValue.customFieldId === fieldId && !!fieldValue?.fieldValue
       )
+      .map((item) => {
+        const { dealId, fieldValue } = item;
+        return `(${validateField(dealId)}, ${validateField(fieldValue)})`;
+      })
       .join(",");
-    await postgres.client.query(
-      `UPDATE ${
-        isDire ? tables.DIRE_AC_DEALS : tables.IC_AC_DEALS
-      } SET ${values} where "id"='${deal_id}'`
-    );
+
+    if (!values?.length) continue;
+
+    if (field.fieldLabel.length > 62) {
+      const query = `SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '${table_name}';`;
+      const db_columns = await postgres.client.query(query);
+      const db_col_name = db_columns.rows.filter((row) => {
+        return field.fieldLabel
+          .toLocaleLowerCase()
+          .includes(row.column_name.toLocaleLowerCase());
+      })[0].column_name;
+      if (!db_col_name) values = undefined;
+      field.fieldLabel = db_col_name;
+    }
+
+    !!values &&
+      (await postgres.client.query(`
+    UPDATE "${table_name}"
+    set "${field.fieldLabel}" = nv."${field.fieldLabel}"
+    from(
+        values ${values}
+    ) as nv (id, "${field.fieldLabel}")
+    where "${table_name}".id = nv.id;
+    `));
   }
 };
 
 const sql_deals = async (isDire = false) => {
   try {
     await check_new_columns(isDire ? tables.DIRE_AC_DEALS : tables.IC_AC_DEALS);
-    // await update_custom_fields_deals(isDire);
     return validateArray(
       isDire ? await dire_listAllDeals() : await ac_listAllDeals(),
       ["nextTask"]

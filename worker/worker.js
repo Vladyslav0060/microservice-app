@@ -2,14 +2,16 @@ const Bull = require("bull");
 require("dotenv").config();
 const { contacts, deals, tasks } = require("../src/services/verification");
 const loader = require("../src/services/dashboard/csv/loader");
-const { postgres, postgres_ac } = require("../src/services/dbClient");
+const { postgres, postgres_ac, tables } = require("../src/services/dbClient");
 const {
   sql_contacts,
   sql_deals,
   sql_tasks,
   sql_pipelines,
+  update_custom_fields_contacts,
 } = require("../src/services/dashboard/sql");
 const sql_stages = require("../src/services/dashboard/sql/sql_stages");
+const actions = require("./actions");
 
 process.on("uncaughtException", (error) => console.log("worker ❌", error));
 
@@ -24,16 +26,27 @@ const dbQueue = new Bull("dbQueue", {
 
 dbQueue.process(async function (job, done) {
   console.log("it works");
-
+  // await actions.UPDATE_IC_UC_JOINED_REPORT();
+  // await actions.UPDATE_DIRE_AC_DEALS_FIELDS();
+  console.log("done");
   // await loader();
   // done(null, addToDbQueue("update_ic_ac_contacts"));
   done();
 });
 
 dbQueue.process("update_ic_ac_contacts", async (job, done) => {
-  await postgres.truncate("ic_ac_contacts");
+  await postgres.truncate(tables.IC_AC_CONTACTS);
   console.log("inserting ic_ac_contacts");
-  await postgres.insert("ic_ac_contacts", await sql_contacts());
+  await postgres.insert(tables.IC_AC_CONTACTS, await sql_contacts());
+  await update_custom_fields_contacts(false);
+  done(null, addToDbQueue("update_ic_ac_deals"));
+});
+
+dbQueue.process("update_dire_ac_contacts", async (job, done) => {
+  await postgres.truncate(tables.DIRE_AC_CONTACTS);
+  console.log("inserting ic_ac_contacts");
+  await postgres.insert(tables.DIRE_AC_CONTACTS, await sql_contacts());
+  await update_custom_fields_contacts(true);
   done(null, addToDbQueue("update_ic_ac_deals"));
 });
 
