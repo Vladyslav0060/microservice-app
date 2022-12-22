@@ -3,9 +3,6 @@ const sql = require("../src/services/dashboard/sql");
 const loader = require("../src/services/dashboard/csv/loader");
 
 class QueueActions {
-  constructor() {
-    console.log("NEW QUEUEACTIONS OBJECT");
-  }
   update_ic_ac_contacts = async () => {
     await postgres.truncate(tables.IC_AC_CONTACTS);
     await postgres.insert(tables.IC_AC_CONTACTS, await sql.sql_contacts(false));
