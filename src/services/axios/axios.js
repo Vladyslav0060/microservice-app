@@ -25,11 +25,20 @@ const getData = async (name, isDire = false, params = {}) => {
   let iteration = 0;
   console.log("getData init");
   while (!isLoaded) {
-    // console.log({ offset }, name);
     iteration++;
-    const response = await axios.get(name, {
+    let response = await axios.get(name, {
       params: { limit: limit, offset: offset, ...params },
     });
+    if (name === "deals") {
+      response.data[name] = response.data[name].map((item) => {
+        if (item.value) {
+          item.value = Number(item.value / 100)
+            .toFixed(2)
+            .toString();
+        }
+        return item;
+      });
+    }
     resultArr = resultArr.concat(response.data[name]);
     offset += limit;
     if (response.data.meta.total < offset) isLoaded = true;

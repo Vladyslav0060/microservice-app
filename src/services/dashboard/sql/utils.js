@@ -1,4 +1,5 @@
-const { postgres, get_api_function } = require("../../dbClient");
+const { postgres } = require("../../dbClient");
+const { get_api_function } = require("../../dbClient/utils");
 
 const fillOptionalProps = (object, propertiesToCheck) => {
   propertiesToCheck.forEach((property) => {
@@ -42,14 +43,39 @@ const validateArray = (array, propertiesToCheck = "", limit = false) => {
     .join(",");
 };
 
-const check_new_columns = async (tableName) => {
+const check_new_columns = async (tableName, columns = null) => {
   try {
+    console.log("start", tableName, columns);
     const db_response = await postgres.client
       .query(`SELECT * FROM information_schema.columns
         WHERE
         table_schema = 'public'
         AND table_name = '${tableName}';`);
     const db_columns = db_response.rows;
+    if (columns) {
+      columns.forEach((column) => {
+        const found = db_columns.some((el) => {
+          return (
+            column
+              .toLocaleLowerCase()
+              .includes(el.column_name.toLocaleLowerCase()) &&
+            (column.length > 64
+              ? true
+              : column.length - el.column_name.length < 2)
+          );
+        });
+        if (!found) {
+          console.log("NOT FOUNT", column.substring(0, 62));
+          postgres.client.query(
+            `ALTER TABLE ${tableName} ADD COLUMN "${column.substring(
+              0,
+              62
+            )}" varchar`
+          );
+        }
+      });
+      return;
+    }
     const response = await get_api_function[tableName + "_fields"]();
     // db_columns.forEach((e) => console.log(e.column_name));
     response.forEach((item) => {
@@ -68,7 +94,7 @@ const check_new_columns = async (tableName) => {
       if (!found) {
         postgres.client.query(
           `ALTER TABLE ${tableName} ADD COLUMN "${
-            item.fieldLabel || item.title
+            item.fieldLabel.substring(0, 62) || item.title.substring(0, 62)
           }" varchar`
         );
       }

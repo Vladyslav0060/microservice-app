@@ -25,14 +25,22 @@ const {
 const sql_stages = require("./src/services/dashboard/sql/sql_stages");
 const loader = require("./src/services/dashboard/csv/loader");
 const { check_new_columns } = require("./src/services/dashboard/sql/utils");
+const actions = require("./worker/actions");
+const { get_sql_function } = require("./src/services/dbClient/utils");
 
 const app = express();
 
-// csvService();
+csvService();
 // sql_contacts();
 const test = async () => {
   console.log("start test");
-
+  // await postgres.truncate(tables.DIRE_AC_DEALS);
+  // await postgres.insert(tables.DIRE_AC_DEALS, await sql_deals(true));
+  // await actions.update_dire_ac_stages();
+  // await actions.update_dire_ac_stages();
+  // await actions.update_dire_ac_stages();
+  // await loader();
+  // await update_custom_fields_contacts();
   // await postgres.truncate(tables.IC_AC_DEALS);
   // await postgres.insert(tables.IC_AC_DEALS, await sql_deals(false));
   // await update_custom_fields_deals(false);

@@ -8,6 +8,7 @@ const sql_pipelines = require("./sql_pipelines");
 const sql_contacts_fields = require("./sql_contacts_fields");
 const sql_deals_fields = require("./sql_deals_fields");
 const sql_users = require("./sql_users");
+const sql_stages = require("./sql_stages");
 const sql_task_types = require("./sql_task_types");
 
 module.exports = {
@@ -18,6 +19,10 @@ module.exports = {
   sql_tasks,
   sql_task_types,
   sql_pipelines,
+  sql_users,
+  sql_stages,
+  update_custom_fields_contacts,
+  update_custom_fields_deals,
   sql_contacts_fields,
   sql_deals_fields,
   sql_users,

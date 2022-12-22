@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
 const downloadCsv = require("./downloadCsv");
-const { postgres } = require("../../dbClient");
+const { postgres, tables } = require("../../dbClient");
+const { check_new_columns } = require("../sql/utils");
 
 const loader = async () => {
   const browser = await puppeteer.launch({
@@ -26,9 +27,11 @@ const loader = async () => {
     element.getAttribute("href")
   );
   const parcedCsv = await downloadCsv(downloadLink);
-  console.log(parcedCsv);
+  const csvColumns = parcedCsv[0].replace(/[()']/g, "").split(",");
+  // const csvData = parcedCsv.slice(1);
+  await check_new_columns(tables.IC_UC_JOINED_REPORT, csvColumns);
   await postgres.truncate("ic_uc_joined_report");
-  await postgres.insertByColumns("ic_uc_joined_report", parcedCsv);
+  await postgres.insertByColumns("ic_uc_joined_report", parcedCsv, csvColumns);
   await browser.close();
 };
 

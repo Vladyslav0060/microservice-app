@@ -6,13 +6,13 @@ const csvService = () => {
   });
   dbQueue.on("error", (e) => console.log("dbQueue❌ ", e));
 
-  dbQueue.add(null, {
-    repeat: {
-      every: 60000,
-      // every: 3600000,
-      limit: 5,
-    },
-  });
+  // dbQueue.add("start_db_queue", {
+  //   repeat: {
+  //     every: 900000,
+  //     // every: 3600000,
+  //     limit: 5,
+  //   },
+  // });
 };
 
 module.exports = csvService;

@@ -2,12 +2,14 @@ const { Pool } = require("pg");
 
 class DatabaseClient {
   constructor(database) {
+    console.log("new connection");
     this.client = new Pool({
       host: process.env.IC_UC_HOST,
       port: process.env.IC_UC_PORT,
       user: process.env.IC_UC_USER,
       password: process.env.IC_UC_PASSWORD,
       database: database,
+      ssl: true,
     });
     this.client.connect((err) =>
       console.log(err ? `DB ${database} ${err} ❌` : `DB ${database} ✅`)
@@ -39,12 +41,27 @@ class DatabaseClient {
     }
   };
 
-  insertByColumns = async (name, values) => {
+  addDuplicate(arr) {
+    const duplicates = {};
+    for (let i = 0; i < arr.length; i++) {
+      if (duplicates[arr[i]]) {
+        arr[i] += "_1";
+        duplicates[arr[i]] = true;
+      } else {
+        duplicates[arr[i]] = true;
+      }
+    }
+    return arr;
+  }
+
+  insertByColumns = async (name, values, columns) => {
     try {
-      const columns = await this.getTableColumns(name);
-      console.log(columns);
+      let modifiedColumns = this.addDuplicate(columns);
+      modifiedColumns = modifiedColumns
+        .map((column) => `"${column}"`)
+        .join(",");
       await this.client.query(
-        `INSERT INTO ${name} (${columns}) VALUES ${values}`
+        `INSERT INTO ${name} (${modifiedColumns}) VALUES ${values.slice(1)}`
       );
     } catch (error) {
       console.log("insertByColumns ❌", error);
@@ -61,6 +78,7 @@ class DatabaseClient {
 
   insert = async (name, values) => {
     try {
+      console.log(`INSERT INTO ${name} VALUES ${values}`);
       await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
     } catch (error) {
       console.log("insert ❌", error);
