@@ -28,7 +28,6 @@ const loader = async () => {
   );
   const parcedCsv = await downloadCsv(downloadLink);
   const csvColumns = parcedCsv[0].replace(/[()']/g, "").split(",");
-  // const csvData = parcedCsv.slice(1);
   await check_new_columns(tables.IC_UC_JOINED_REPORT, csvColumns);
   await postgres.truncate("ic_uc_joined_report");
   await postgres.insertByColumns("ic_uc_joined_report", parcedCsv, csvColumns);

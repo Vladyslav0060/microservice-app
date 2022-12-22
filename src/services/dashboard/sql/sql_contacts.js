@@ -23,7 +23,6 @@ const update_custom_fields_contacts = async (isDire) => {
         limit: 100,
       });
 
-      console.log(field.title, " started");
       const values = fieldValues
         .filter((fieldValue) => !!fieldValue.value)
         .map((fieldValue) => {
@@ -42,12 +41,7 @@ const update_custom_fields_contacts = async (isDire) => {
         if (!db_col_name) values = undefined;
         field.title = db_col_name;
       }
-      console.log(`UPDATE "${table_name}"
-      set "${field.title}" = nv."${field.title}"
-      from(
-          values ${values}
-      ) as nv (id, "${field.title}")
-      where "${table_name}".id = nv.id;`);
+
       values &&
         (await postgres.client.query(`
       UPDATE "${table_name}"
@@ -57,15 +51,12 @@ const update_custom_fields_contacts = async (isDire) => {
       ) as nv (id, "${field.title}")
       where "${table_name}".id = nv.id;
       `));
-      console.log(field.title, " done");
     };
 
     for (let item of chunkedArray) {
       const responses = item.map((field) => getDataByColumn(field));
       await Promise.all(responses);
     }
-
-    console.log("all updated");
   } catch (error) {
     console.log(error);
   }
@@ -76,7 +67,6 @@ const sql_contacts = async (isDire = false) => {
     await check_new_columns(
       isDire ? tables.DIRE_AC_CONTACTS : tables.IC_AC_CONTACTS
     );
-    // await update_custom_fields_contacts(isDire);
     return validateArray(
       isDire ? await dire_listAllContacts() : await ac_listAllContacts()
     );

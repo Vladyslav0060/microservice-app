@@ -17,13 +17,11 @@ const dire_axios = axios.create({
 
 const getData = async (name, isDire = false, params = {}) => {
   let limit = params?.limit || 100;
-  console.log(name);
   let offset = 0;
   let isLoaded = false;
   let resultArr = [];
   const axios = isDire ? dire_axios : ac_axios;
   let iteration = 0;
-  console.log("getData init");
   while (!isLoaded) {
     iteration++;
     let response = await axios.get(name, {
@@ -43,7 +41,6 @@ const getData = async (name, isDire = false, params = {}) => {
     offset += limit;
     if (response.data.meta.total < offset) isLoaded = true;
   }
-  console.log("\nfetched\n", resultArr.length);
   return resultArr;
 };
 

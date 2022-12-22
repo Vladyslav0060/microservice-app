@@ -6,8 +6,7 @@
   "scripts": {
     "start:production": "node index.js",
     "start:dev": "nodemon index.js",
-    "start:worker": "node ./worker/worker.js",
-    "dev": "webpack"
+    "start:worker": "node ./worker/worker.js"
   },
   "keywords": [],
   "author": "",

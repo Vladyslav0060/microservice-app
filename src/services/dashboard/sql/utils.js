@@ -12,11 +12,7 @@ const validateField = (field) => {
     ? `'${JSON.stringify(field).replace(/'/g, "''")}'`.replace(/"/g, "")
     : !field
     ? `'${JSON.stringify(field).replace(/'/g, "''")}'`.replace(/"/g, "")
-    : `'${JSON.stringify(field)
-        // .replace(/\'/g, "''")
-        .replace(/'/g, "''")
-        .replace(/"/g, "")}'`;
-  // `'${JSON.stringify(field).replace(/'/g, "''")}'`.replace(/"/g, "");
+    : `'${JSON.stringify(field).replace(/'/g, "''").replace(/"/g, "")}'`;
 };
 
 const validateArray = (array, propertiesToCheck = "", limit = false) => {
@@ -32,10 +28,7 @@ const validateArray = (array, propertiesToCheck = "", limit = false) => {
           ? `'${JSON.stringify(field).replace(/'/g, "''")}'`.replace(/"/g, "")
           : !field
           ? `'${JSON.stringify(field).replace(/'/g, "''")}'`.replace(/"/g, "")
-          : `'${JSON.stringify(field)
-              // .replace(/\'/g, "''")
-              .replace(/'/g, "''")
-              .replace(/"/g, "")}'`;
+          : `'${JSON.stringify(field).replace(/'/g, "''").replace(/"/g, "")}'`;
       });
       return `(${result})`;
     })
@@ -45,7 +38,6 @@ const validateArray = (array, propertiesToCheck = "", limit = false) => {
 
 const check_new_columns = async (tableName, columns = null) => {
   try {
-    console.log("start", tableName, columns);
     const db_response = await postgres.client
       .query(`SELECT * FROM information_schema.columns
         WHERE
@@ -65,7 +57,6 @@ const check_new_columns = async (tableName, columns = null) => {
           );
         });
         if (!found) {
-          console.log("NOT FOUNT", column.substring(0, 62));
           postgres.client.query(
             `ALTER TABLE ${tableName} ADD COLUMN "${column.substring(
               0,
@@ -77,7 +68,6 @@ const check_new_columns = async (tableName, columns = null) => {
       return;
     }
     const response = await get_api_function[tableName + "_fields"]();
-    // db_columns.forEach((e) => console.log(e.column_name));
     response.forEach((item) => {
       const found = db_columns.some((el) => {
         const col_name = item.fieldLabel || item.title;

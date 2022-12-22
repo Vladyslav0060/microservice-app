@@ -2,7 +2,6 @@ const { Pool } = require("pg");
 
 class DatabaseClient {
   constructor(database) {
-    console.log("new connection");
     this.client = new Pool({
       host: process.env.IC_UC_HOST,
       port: process.env.IC_UC_PORT,
@@ -78,7 +77,6 @@ class DatabaseClient {
 
   insert = async (name, values) => {
     try {
-      console.log(`INSERT INTO ${name} VALUES ${values}`);
       await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
     } catch (error) {
       console.log("insert ❌", error);
