@@ -1,14 +1,7 @@
 const { Router } = require("express");
-const Bull = require("bull");
+const { init_verification_queue } = require("../services/queues");
 
 const verificationRouter = Router();
-
-const queue = new Bull("queue", {
-  redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
-  limiter: { max: 5, duration: 1000 },
-});
-
-const start = (email, dev) => queue.add("listContacts", { email, dev });
 
 const verificateTasks = async (req, res) => {
   try {
@@ -17,7 +10,7 @@ const verificateTasks = async (req, res) => {
       req.originalUrl.split("?email")[0].split("/").at(-1) === "dev";
     if (!email || req.headers.api_key !== process.env.API_KEY)
       return res.sendStatus(401);
-    start(email.split(" ").join("+"), isDev);
+    init_verification_queue(email.split(" ").join("+"), isDev);
     return res.sendStatus(200);
   } catch (error) {
     return res.send(404).send(error);

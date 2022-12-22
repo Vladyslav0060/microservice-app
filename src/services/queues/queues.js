@@ -1,6 +1,4 @@
 const Bull = require("bull");
-const { createBullBoard } = require("bull-board");
-const { BullAdapter } = require("bull-board/bullAdapter");
 
 const verification_queue = new Bull("verification_queue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
@@ -11,9 +9,15 @@ const db_queue = new Bull("db_queue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
 });
 
-const { router } = createBullBoard([
-  new BullAdapter(verification_queue),
-  new BullAdapter(db_queue),
-]);
+const init_verification_queue = (email, dev) =>
+  verification_queue.add("listContacts", { email, dev });
 
-module.exports = router;
+const init_db_queue = () =>
+  db_queue.add("start_db_queue", {
+    repeat: {
+      every: 3600000,
+      limit: 5,
+    },
+  });
+
+module.exports = { init_verification_queue, init_db_queue };

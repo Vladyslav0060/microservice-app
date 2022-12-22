@@ -1,11 +1,11 @@
 const express = require("express");
 require("dotenv").config();
 const { adminRouter, verificationRouter } = require("./src/routers");
-const csvService = require("./src/services/csv/csvService");
+const { init_db_queue } = require("./src/services/queues");
 
 const app = express();
 
-csvService();
+init_db_queue();
 
 app.use("/admin/queues", adminRouter);
 

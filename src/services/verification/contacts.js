@@ -1,4 +1,4 @@
-const { instance, instanceDev } = require("./instance");
+const { ac_axios, ac_axios_dev } = require("./instance");
 
 const listAllContacts = async (email, dev) => {
   email = email.replace(/@/g, "%");
@@ -7,7 +7,7 @@ const listAllContacts = async (email, dev) => {
     params: { email: email, status: "-1" },
   };
   try {
-    const http = dev ? instanceDev : instance;
+    const http = dev ? ac_axios_dev : ac_axios;
     const res = await http.get(options.url, { params: options.params });
     if (!res.data?.contacts[0]) return false;
     const { id } = res.data.contacts[0];
