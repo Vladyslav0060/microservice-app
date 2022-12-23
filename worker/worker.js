@@ -4,7 +4,7 @@ require("events").setMaxListeners(100);
 const { contacts, deals, tasks } = require("../src/services/verification");
 const actions = require("./actions");
 
-process.on("uncaughtException", (error) => console.log("worker ❌", error));
+// process.on("uncaughtException", (error) => console.log("worker ❌", error));
 
 const verification_queue = new Bull("verification_queue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
@@ -14,6 +14,12 @@ const verification_queue = new Bull("verification_queue", {
 const db_queue = new Bull("db_queue", {
   redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
 });
+
+const addToDbQueue = (name, data = {}, ...props) =>
+  db_queue.add(name, data, {
+    attempts: 3,
+    ...props,
+  });
 
 db_queue.process("start_db_queue", async function (job, done) {
   done(null, addToDbQueue("update_ic_ac_contacts_fields"));
@@ -86,13 +92,14 @@ db_queue.process("update_ic_ac_tasks", async (job, done) => {
 
 db_queue.process("update_dire_ac_tasks", async (job, done) => {
   await actions.update_dire_ac_tasks();
-  done(null, addToDbQueue("update_ic_uc_joined_report"));
-});
-
-db_queue.process("update_ic_uc_joined_report", async (job, done) => {
-  await actions.update_ic_uc_joined_report();
+  // done(null, addToDbQueue("update_ic_uc_joined_report"));
   done(null, addToDbQueue("update_ic_ac_contacts"));
 });
+
+// db_queue.process("update_ic_uc_joined_report", async (job, done) => {
+//   await actions.update_ic_uc_joined_report();
+//   done(null, addToDbQueue("update_ic_ac_contacts"));
+// });
 
 db_queue.process("update_ic_ac_contacts", async (job, done) => {
   await actions.update_ic_ac_contacts();
@@ -113,13 +120,6 @@ db_queue.process("update_dire_ac_deals", async (job, done) => {
   await actions.update_dire_ac_deals();
   done();
 });
-
-const addToDbQueue = (name, data = {}, ...props) =>
-  db_queue.add(name, data, {
-    attempts: 60,
-    backoff: 500,
-    ...props,
-  });
 
 const addToQueue = (name, data, ...props) =>
   verification_queue.add(name, data, {

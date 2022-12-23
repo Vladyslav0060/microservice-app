@@ -27,7 +27,7 @@ const update_custom_fields_deals = async (isDire = false) => {
     if (field.fieldLabel.length > 62) {
       const query = `SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '${table_name}';`;
       const db_columns = await postgres.client.query(query);
-      const db_col_name = db_columns.rows.filter((row) => {
+      const db_col_name = db_columns[1].rows.filter((row) => {
         return field.fieldLabel
           .toLocaleLowerCase()
           .includes(row.column_name.toLocaleLowerCase());
@@ -35,7 +35,6 @@ const update_custom_fields_deals = async (isDire = false) => {
       if (!db_col_name) values = undefined;
       field.fieldLabel = db_col_name;
     }
-
     !!values &&
       (await postgres.client.query(`
     UPDATE "${table_name}"

@@ -1,18 +1,51 @@
-const { Pool } = require("pg");
+// const { Pool, Client } = require("pg");
+const { Sequelize } = require("sequelize");
 
 class DatabaseClient {
   constructor(database) {
-    this.client = new Pool({
-      host: process.env.IC_UC_HOST,
-      port: process.env.IC_UC_PORT,
-      user: process.env.IC_UC_USER,
-      password: process.env.IC_UC_PASSWORD,
-      database: database,
-      ssl: true,
-    });
-    this.client.connect((err) =>
-      console.log(err ? `DB ${database} ${err} ❌` : `DB ${database} ✅`)
+    console.log("new db client", database);
+    this.client = new Sequelize(
+      database,
+      process.env.IC_UC_USER,
+      process.env.IC_UC_PASSWORD,
+      {
+        host: process.env.IC_UC_HOST,
+        dialect: "postgres",
+        dialectOptions: {
+          ssl: true,
+        },
+      }
     );
+    try {
+      this.client
+        .authenticate()
+        .then(() =>
+          console.log(
+            `Connection to ${database} has been established successfully.`
+          )
+        );
+    } catch (error) {
+      console.error("Unable to connect to the database:", error);
+    }
+
+    // this.client = new Pool({
+    //   host: process.env.IC_UC_HOST,
+    //   port: process.env.IC_UC_PORT,
+    //   user: process.env.IC_UC_USER,
+    //   password: process.env.IC_UC_PASSWORD,
+    //   database: database,
+    //   ssl: true,
+    //   min: 0,
+    //   max: 10,
+    //   createTimeoutMillis: 8000,
+    //   acquireTimeoutMillis: 8000,
+    //   idleTimeoutMillis: 20000,
+    //   reapIntervalMillis: 1000,
+    //   createRetryIntervalMillis: 100,
+    // });
+    // this.client.connect((err) =>
+    //   console.log(err ? `DB ${database} ${err} ❌` : `DB ${database} ✅`)
+    // );
   }
 
   getTableColumns = async (
@@ -24,7 +57,7 @@ class DatabaseClient {
         .query(
           `SELECT *
         FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_NAME = N'${tableName}' ORDER BY 
+        WHERE TABLE_NAME = N'${tableName}' ORDER BY
         ordinal_position`
         )
         .then((response) => {

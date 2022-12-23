@@ -33,7 +33,7 @@ const update_custom_fields_contacts = async (isDire) => {
       if (field.title.length > 62) {
         const query = `SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '${table_name}';`;
         const db_columns = await postgres.client.query(query);
-        const db_col_name = db_columns.rows.filter((row) => {
+        const db_col_name = db_columns[1].rows.filter((row) => {
           return field.title
             .toLocaleLowerCase()
             .includes(row.column_name.toLocaleLowerCase());
