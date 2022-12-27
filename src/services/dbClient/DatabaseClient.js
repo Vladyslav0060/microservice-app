@@ -1,18 +1,26 @@
-const { Pool } = require("pg");
+// const { Pool, Client } = require("pg");
+const { Sequelize } = require("sequelize");
 
 class DatabaseClient {
   constructor(database) {
-    this.client = new Pool({
-      host: process.env.IC_UC_HOST,
-      port: process.env.IC_UC_PORT,
-      user: process.env.IC_UC_USER,
-      password: process.env.IC_UC_PASSWORD,
-      database: database,
-      ssl: true,
-    });
-    this.client.connect((err) =>
-      console.log(err ? `DB ${database} ${err} ❌` : `DB ${database} ✅`)
+    this.client = new Sequelize(
+      database,
+      process.env.IC_UC_USER,
+      process.env.IC_UC_PASSWORD,
+      {
+        host: process.env.IC_UC_HOST,
+        dialect: "postgres",
+        logging: process.env.NODE_ENV === "production" ? false : true,
+        dialectOptions: {
+          ssl: true,
+        },
+      }
     );
+    try {
+      this.client.authenticate().then(() => console.log(`DB ${database} ✅`));
+    } catch (error) {
+      console.error(`Unable to connect to the database ${database}:`, error);
+    }
   }
 
   getTableColumns = async (
@@ -24,7 +32,7 @@ class DatabaseClient {
         .query(
           `SELECT *
         FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_NAME = N'${tableName}' ORDER BY 
+        WHERE TABLE_NAME = N'${tableName}' ORDER BY
         ordinal_position`
         )
         .then((response) => {
@@ -77,7 +85,8 @@ class DatabaseClient {
 
   insert = async (name, values) => {
     try {
-      await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
+      if (values)
+        await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
     } catch (error) {
       console.log("insert ❌", error);
     }

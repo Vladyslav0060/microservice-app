@@ -3,9 +3,11 @@ require("dotenv").config();
 const { adminRouter, verificationRouter } = require("./src/routers");
 const { init_db_queue } = require("./src/services/queues");
 
-const app = express();
+process.on("uncaughtException", (err) => console.log(err));
 
 init_db_queue();
+
+const app = express();
 
 app.use("/admin/queues", adminRouter);
 

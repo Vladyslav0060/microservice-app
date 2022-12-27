@@ -43,7 +43,7 @@ const check_new_columns = async (tableName, columns = null) => {
         WHERE
         table_schema = 'public'
         AND table_name = '${tableName}';`);
-    const db_columns = db_response.rows;
+    const db_columns = db_response[1].rows;
     if (columns) {
       columns.forEach((column) => {
         const found = db_columns.some((el) => {
