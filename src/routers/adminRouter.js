@@ -1,5 +1,8 @@
-const { createBullBoard } = require("bull-board");
-const { BullAdapter } = require("bull-board/bullAdapter");
+const {
+  ExpressAdapter,
+  createBullBoard,
+  BullMQAdapter,
+} = require("@bull-board/express");
 const { Queue } = require("bullmq");
 
 const connection = {
@@ -15,9 +18,12 @@ const db_queue = new Queue("db_queue", {
   connection: connection,
 });
 
-const { router } = createBullBoard([
-  new BullAdapter(verification_queue),
-  new BullAdapter(db_queue),
-]);
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath("/admin/queues");
 
-module.exports = router;
+createBullBoard({
+  queues: [new BullMQAdapter(db_queue), new BullMQAdapter(verification_queue)],
+  serverAdapter,
+});
+
+module.exports = serverAdapter.getRouter();

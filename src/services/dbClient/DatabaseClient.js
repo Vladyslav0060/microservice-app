@@ -9,7 +9,7 @@ class DatabaseClient {
       {
         host: process.env.IC_UC_HOST,
         dialect: "postgres",
-        logging: process.env.NODE_ENV === "production" ? false : true,
+        logging: () => (process.env.NODE_ENV === "production" ? false : true),
         dialectOptions: {
           ssl: true,
         },
