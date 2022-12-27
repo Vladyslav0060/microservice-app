@@ -1,6 +1,6 @@
 require("dotenv").config();
 require("events").setMaxListeners(100);
-const { Queue, Worker, ErrorCode } = require("bullmq");
+const { Queue, Worker } = require("bullmq");
 const { contacts, deals, tasks } = require("../src/services/verification");
 const actions = require("./actions");
 
@@ -8,11 +8,11 @@ const connection = {
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
 };
+
 const defaultJobOptions = {
   attempts: 5,
   backoff: { type: "exponential", delay: 1000 },
 };
-// process.on("uncaughtException", (error) => console.log("worker ❌", error));
 
 const verification_queue = new Queue("verification_queue", {
   connection: connection,
