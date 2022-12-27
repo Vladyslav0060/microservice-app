@@ -5,10 +5,9 @@ const connection = {
   port: process.env.REDIS_PORT,
 };
 const defaultJobOptions = {
-  attempts: 3,
+  attempts: 5,
   backoff: { type: "exponential", delay: 1000 },
 };
-// process.on("uncaughtException", (error) => console.log("worker ❌", error));
 
 const verification_queue = new Queue("verification_queue", {
   connection: connection,
