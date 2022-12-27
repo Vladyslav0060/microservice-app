@@ -1,14 +1,24 @@
-const Bull = require("bull");
+const { Queue } = require("bullmq");
 
-const verification_queue = new Bull("verification_queue", {
-  redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
-  limiter: { max: 5, duration: 1000 },
+const connection = {
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+};
+const defaultJobOptions = {
+  attempts: 3,
+  backoff: { type: "exponential", delay: 1000 },
+};
+// process.on("uncaughtException", (error) => console.log("worker ❌", error));
+
+const verification_queue = new Queue("verification_queue", {
+  connection: connection,
+  defaultJobOptions: defaultJobOptions,
 });
 
-const db_queue = new Bull("db_queue", {
-  redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT },
+const db_queue = new Queue("db_queue", {
+  connection: connection,
+  defaultJobOptions: defaultJobOptions,
 });
-
 const init_verification_queue = (email, dev) =>
   verification_queue.add("listContacts", { email, dev });
 

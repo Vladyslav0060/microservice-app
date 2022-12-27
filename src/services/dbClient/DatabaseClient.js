@@ -3,7 +3,6 @@ const { Sequelize } = require("sequelize");
 
 class DatabaseClient {
   constructor(database) {
-    console.log("new db client", database);
     this.client = new Sequelize(
       database,
       process.env.IC_UC_USER,
@@ -11,41 +10,17 @@ class DatabaseClient {
       {
         host: process.env.IC_UC_HOST,
         dialect: "postgres",
+        logging: process.env.NODE_ENV === "production" ? false : true,
         dialectOptions: {
           ssl: true,
         },
       }
     );
     try {
-      this.client
-        .authenticate()
-        .then(() =>
-          console.log(
-            `Connection to ${database} has been established successfully.`
-          )
-        );
+      this.client.authenticate().then(() => console.log(`DB ${database} ✅`));
     } catch (error) {
-      console.error("Unable to connect to the database:", error);
+      console.error(`Unable to connect to the database ${database}:`, error);
     }
-
-    // this.client = new Pool({
-    //   host: process.env.IC_UC_HOST,
-    //   port: process.env.IC_UC_PORT,
-    //   user: process.env.IC_UC_USER,
-    //   password: process.env.IC_UC_PASSWORD,
-    //   database: database,
-    //   ssl: true,
-    //   min: 0,
-    //   max: 10,
-    //   createTimeoutMillis: 8000,
-    //   acquireTimeoutMillis: 8000,
-    //   idleTimeoutMillis: 20000,
-    //   reapIntervalMillis: 1000,
-    //   createRetryIntervalMillis: 100,
-    // });
-    // this.client.connect((err) =>
-    //   console.log(err ? `DB ${database} ${err} ❌` : `DB ${database} ✅`)
-    // );
   }
 
   getTableColumns = async (
@@ -110,7 +85,8 @@ class DatabaseClient {
 
   insert = async (name, values) => {
     try {
-      await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
+      if (values)
+        await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
     } catch (error) {
       console.log("insert ❌", error);
     }
