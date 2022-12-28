@@ -7,7 +7,7 @@ const sql_users = async (isDire = false) => {
       isDire ? await dire_listAllUsers() : await ac_listAllUsers()
     );
   } catch (error) {
-    console.log("❌ sql_users", error);
+    throw new Error("❌ sql_users", error);
   }
 };
 

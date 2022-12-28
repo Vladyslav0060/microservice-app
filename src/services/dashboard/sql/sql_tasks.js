@@ -8,7 +8,7 @@ const sql_tasks = async (isDire = false) => {
       ["taskOutcome", "updatedBy", "doneBy"]
     );
   } catch (error) {
-    console.log("❌ sql_tasks", error);
+    throw new Error("❌ sql_tasks", error);
   }
 };
 

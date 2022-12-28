@@ -58,7 +58,7 @@ const update_custom_fields_contacts = async (isDire) => {
       await Promise.all(responses);
     }
   } catch (error) {
-    console.log(error);
+    throw new Error("❌ update_custom_fields_contacts", error);
   }
 };
 
@@ -71,7 +71,7 @@ const sql_contacts = async (isDire = false) => {
       isDire ? await dire_listAllContacts() : await ac_listAllContacts()
     );
   } catch (error) {
-    console.log("❌ contacts", error);
+    throw new Error("❌ contacts", error);
   }
 };
 

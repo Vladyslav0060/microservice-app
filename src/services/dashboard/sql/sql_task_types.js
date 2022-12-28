@@ -7,7 +7,7 @@ const sql_tasks_types = async (isDire = false) => {
       isDire ? await dire_listAllTaskTypes() : await ac_listAllTaskTypes()
     );
   } catch (error) {
-    console.log("❌ sql_tasks", error);
+    throw new Error("❌ sql_tasks_types", error);
   }
 };
 

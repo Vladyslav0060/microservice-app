@@ -7,7 +7,7 @@ const sql_stages = async (isDire = false) => {
       isDire ? await dire_listAllStages() : await ac_listAllStages()
     );
   } catch (error) {
-    console.log("❌ sql_stages", error);
+    throw new Error("❌ sql_stages", error);
   }
 };
 

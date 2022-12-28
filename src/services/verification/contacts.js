@@ -14,7 +14,7 @@ const listAllContacts = async (email, dev) => {
     if (!id) throw new Error("User wasn't found");
     return id;
   } catch (error) {
-    throw new Error(error);
+    throw new Error("❌ listAllContacts ", error);
   }
 };
 

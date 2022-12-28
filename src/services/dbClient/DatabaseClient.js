@@ -18,7 +18,7 @@ class DatabaseClient {
     try {
       this.client.authenticate().then(() => console.log(`DB ${database} ✅`));
     } catch (error) {
-      console.error(`Unable to connect to the database ${database}:`, error);
+      throw new Error(`Unable to connect to the database ${database}:`, error);
     }
   }
 
@@ -43,7 +43,7 @@ class DatabaseClient {
             .join(",");
         });
     } catch (error) {
-      console.log("getTableColumns ❌", error);
+      throw new Error("getTableColumns ❌", error);
     }
   };
 
@@ -70,7 +70,7 @@ class DatabaseClient {
         `INSERT INTO ${name} (${modifiedColumns}) VALUES ${values.slice(1)}`
       );
     } catch (error) {
-      console.log("insertByColumns ❌", error);
+      throw new Error("insertByColumns ❌", error);
     }
   };
 
@@ -78,7 +78,7 @@ class DatabaseClient {
     try {
       await this.client.query(`TRUNCATE TABLE ${name}`);
     } catch (error) {
-      console.log("truncate ❌", error);
+      throw new Error("truncate ❌", error);
     }
   };
 
@@ -87,7 +87,7 @@ class DatabaseClient {
       if (values)
         await this.client.query(`INSERT INTO ${name} VALUES ${values}`);
     } catch (error) {
-      console.log("insert ❌", error);
+      throw new Error("insert ❌", error);
     }
   };
 }

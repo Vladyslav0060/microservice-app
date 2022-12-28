@@ -25,7 +25,6 @@ const init_db_queue = () =>
   db_queue.add("start_db_queue", {
     repeat: {
       every: 3600000,
-      limit: 5,
     },
   });
 
