@@ -27,8 +27,8 @@ const listAllTasks = async (foundIds, dev) => {
       result = result?.filter((value) => !!value?.length);
       return [].concat(...result);
     })
-    .catch((e) => {
-      throw new Error(e);
+    .catch((error) => {
+      throw new Error("listAllTasks ❌", error);
     });
 };
 
@@ -43,8 +43,8 @@ const closeTasks = async (taskIds, dev) => {
       };
       await http.request(options);
     })
-  ).catch((e) => {
-    throw new Error(e);
+  ).catch((error) => {
+    throw new Error("closeTasks ❌", error);
   });
 };
 

@@ -10,7 +10,7 @@ const listAllDeals = async (userId, dev) => {
     if (!res.data?.deals) throw new Error("No deals were found");
     return res.data.deals.map((deal) => deal.id);
   } catch (error) {
-    throw new Error(error);
+    throw new Error("listAllDeals ❌", error);
   }
 };
 

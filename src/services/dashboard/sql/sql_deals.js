@@ -55,7 +55,7 @@ const sql_deals = async (isDire = false) => {
       ["nextTask"]
     );
   } catch (error) {
-    console.log("❌ sql_deals", error);
+    throw new Error("❌ sql_deals", error);
   }
 };
 

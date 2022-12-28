@@ -7,7 +7,7 @@ const sql_tasks = async (isDire = false) => {
       isDire ? await dire_listAllPipelines() : await ac_listAllPipelines()
     );
   } catch (error) {
-    console.log("❌ contacts", error);
+    throw new Error("❌ sql_tasks", error);
   }
 };
 

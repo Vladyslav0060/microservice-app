@@ -14,7 +14,7 @@ const sql_deals_fields = async (isDire = false) => {
       true
     );
   } catch (error) {
-    console.log("❌ sql_deals_fields", error);
+    throw new Error("❌ sql_deals_fields", error);
   }
 };
 

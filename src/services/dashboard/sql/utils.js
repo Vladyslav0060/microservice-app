@@ -90,7 +90,7 @@ const check_new_columns = async (tableName, columns = null) => {
       }
     });
   } catch (error) {
-    console.log("❌ check_new_columns", error);
+    throw new Error("❌ check_new_columns", error);
   }
 };
 
