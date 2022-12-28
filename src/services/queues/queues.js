@@ -22,10 +22,6 @@ const init_verification_queue = (email, dev) =>
   verification_queue.add("listContacts", { email, dev });
 
 const init_db_queue = () =>
-  db_queue.add("start_db_queue", {
-    repeat: {
-      every: 3600000,
-    },
-  });
+  db_queue.add("start_db_queue", null, { repeat: { every: 3600000 } });
 
 module.exports = { init_verification_queue, init_db_queue };
