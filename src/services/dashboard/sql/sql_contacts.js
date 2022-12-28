@@ -15,7 +15,7 @@ const update_custom_fields_contacts = async (isDire) => {
   try {
     const table_name = isDire ? tables.DIRE_AC_CONTACTS : tables.IC_AC_CONTACTS;
     const fields = await getData("fields", isDire);
-    const chunkedArray = sliceIntoChunks(fields, 20);
+    const chunkedArray = sliceIntoChunks(fields, 10);
 
     const getDataByColumn = async (field) => {
       const fieldValues = await getData("fieldValues", isDire, {
