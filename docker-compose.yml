@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis_container
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server
+    environment:
+      - ALLOW_EMPTY_PASSWORDS=yes
+
+  server:
+    container_name: backend_container
+    build: .
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    command: npm run start:${NODE_ENV}
+    depends_on:
+      - redis
+
+  worker:
+    container_name: worker_container
+    build: .
+    restart: always
+    command: npm run start:worker
+    depends_on:
+      - server
